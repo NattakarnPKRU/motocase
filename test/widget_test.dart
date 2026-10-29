@@ -61,6 +61,7 @@ void main() {
       'ADV160': 'honda-adv160.png',
       'ADV350': 'honda-adv350.png',
       'Africa Twin': 'honda-africa-twin.png',
+      'CB1000 GT': 'honda-cb1000-gt.png',
       'CB1000R': 'honda-cb1000r.png',
       'CB400 Super Four': 'honda-cb400-super-four.png',
       'CBR1000RR-R': 'honda-cbr1000rr-r.png',
@@ -75,6 +76,7 @@ void main() {
       'MSX125 Grom': 'honda-msx125-grom.png',
       'Monkey 125': 'honda-monkey-125.png',
       'Monkey FTR Limited Edition': 'honda-monkey-ftr-limited-edition.png',
+      'NM4': 'honda-nm4.png',
       'PCX160': 'honda-pcx160.png',
       'Rebel 500': 'honda-rebel-500.png',
       'Wave125i': 'honda-wave125i.png',
@@ -86,6 +88,56 @@ void main() {
       final path = 'assets/bikes/${entry.value}';
       expect((await rootBundle.load(path)).lengthInBytes, greaterThan(0));
       final bike = brands['Honda']!.$2.firstWhere(
+        (model) => model.name == entry.key,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(home: Scaffold(body: BikeImage(Drop(bike)))),
+      );
+      await tester.pumpAndSettle();
+
+      final image = tester.widget<Image>(find.byType(Image));
+      expect(
+        image.image,
+        isA<AssetImage>().having(
+          (asset) => asset.assetName,
+          'asset name',
+          path,
+        ),
+      );
+      expect(find.byType(SvgPicture), findsNothing);
+    }
+  });
+
+  testWidgets('supplied Yamaha model images load instead of SVG silhouettes', (
+    WidgetTester tester,
+  ) async {
+    const imageNames = {
+      'Aerox155': 'yamaha-aerox155.png',
+      'Fino 125': 'yamaha-fino-125.png',
+      'Grand Filano': 'yamaha-grand-filano.png',
+      'MT-03': 'yamaha-mt-03.png',
+      'MT-07': 'yamaha-mt-07.png',
+      'MT-09': 'yamaha-mt-09.png',
+      'MT-15': 'yamaha-mt-15.png',
+      'NMAX155': 'yamaha-nmax155.png',
+      'PG-1': 'yamaha-pg-1.png',
+      'R1': 'yamaha-r1.png',
+      'R15': 'yamaha-r15.png',
+      'R7': 'yamaha-r7.png',
+      'TMAX 530': 'yamaha-tmax-530.png',
+      'Tenere 700': 'yamaha-tenere-700.png',
+      'Tracer 9 GT': 'yamaha-tracer-9-gt.png',
+      'XMAX Tech MAX': 'yamaha-xmax-tech-max.png',
+      'XSR155': 'yamaha-xsr155.png',
+      'YZF-R1 60th Ltd': 'yamaha-yzf-r1-60th-ltd.png',
+      'YZF-R3': 'yamaha-yzf-r3.png',
+    };
+
+    for (final entry in imageNames.entries) {
+      final path = 'assets/bikes/${entry.value}';
+      expect((await rootBundle.load(path)).lengthInBytes, greaterThan(0));
+      final bike = brands['Yamaha']!.$2.firstWhere(
         (model) => model.name == entry.key,
       );
 
@@ -151,6 +203,74 @@ void main() {
 
     expect(bike.cc, 125);
     expect(bike.value, 121900);
+  });
+
+  test('Honda model prices match the current model list', () {
+    final hondaBikes = brands['Honda']!.$2;
+    final click125i = hondaBikes.singleWhere(
+      (bike) => bike.name == 'Click125i',
+    );
+    final cbr250rr = hondaBikes.singleWhere(
+      (bike) => bike.name == 'CBR250RR',
+    );
+
+    expect(click125i.value, 55600);
+    expect(cbr250rr.value, 259000);
+    expect(hondaBikes.any((bike) => bike.name == 'CB650R'), isFalse);
+  });
+
+  test('Honda CB1000 GT replaces NSR250R SP', () {
+    final hondaBikes = brands['Honda']!.$2;
+    final cb1000Gt = hondaBikes.singleWhere(
+      (bike) => bike.name == 'CB1000 GT',
+    );
+
+    expect(cb1000Gt.cc, 1000);
+    expect(cb1000Gt.value, 514000);
+    expect(cb1000Gt.tier, Tier.rd);
+    expect(hondaBikes.any((bike) => bike.name == 'NSR250R SP'), isFalse);
+  });
+
+  test('Honda NM4 replaces CBR600RR at the requested price', () {
+    final hondaBikes = brands['Honda']!.$2;
+    final nm4 = hondaBikes.singleWhere((bike) => bike.name == 'NM4');
+
+    expect(nm4.cc, 745);
+    expect(nm4.value, 529000);
+    expect(hondaBikes.any((bike) => bike.name == 'CBR600RR'), isFalse);
+  });
+
+  test('Yamaha PG-1 and MT-15 replace R25 and MT-25 at requested prices', () {
+    final yamahaBikes = brands['Yamaha']!.$2;
+    final pg1 = yamahaBikes.singleWhere((bike) => bike.name == 'PG-1');
+    final mt15 = yamahaBikes.singleWhere((bike) => bike.name == 'MT-15');
+
+    expect(pg1.cc, 114);
+    expect(pg1.value, 57500);
+    expect(mt15.cc, 155);
+    expect(mt15.value, 101000);
+    expect(yamahaBikes.any((bike) => bike.name == 'R25'), isFalse);
+    expect(yamahaBikes.any((bike) => bike.name == 'MT-25'), isFalse);
+  });
+
+  test('Yamaha XMAX Tech MAX replaces XMAX300 at the existing price', () {
+    final yamahaBikes = brands['Yamaha']!.$2;
+    final xmaxTechMax = yamahaBikes.singleWhere(
+      (bike) => bike.name == 'XMAX Tech MAX',
+    );
+
+    expect(xmaxTechMax.cc, 292);
+    expect(xmaxTechMax.value, 205000);
+    expect(yamahaBikes.any((bike) => bike.name == 'XMAX300'), isFalse);
+  });
+
+  test('Yamaha MT-09 replaces MT-10 at the requested price', () {
+    final yamahaBikes = brands['Yamaha']!.$2;
+    final mt09 = yamahaBikes.singleWhere((bike) => bike.name == 'MT-09');
+
+    expect(mt09.cc, 890);
+    expect(mt09.value, 399000);
+    expect(yamahaBikes.any((bike) => bike.name == 'MT-10'), isFalse);
   });
 
   test('Honda Goldwing is gold tier', () {
