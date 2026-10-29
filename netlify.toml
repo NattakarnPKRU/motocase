@@ -1,0 +1,8 @@
+[build]
+  command = "git clone --depth 1 --branch 3.44.5 https://github.com/flutter/flutter.git \"$HOME/flutter\" && export PATH=\"$HOME/flutter/bin:$PATH\" && flutter config --enable-web && flutter pub get && flutter build web --release"
+  publish = "build/web"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

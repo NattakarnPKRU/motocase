@@ -8,21 +8,21 @@
 flutter run -d chrome
 ```
 
-## เผยแพร่บน GitHub Pages
+## เผยแพร่บน Netlify
 
-โปรเจกต์มี GitHub Actions workflow สำหรับ build และ deploy เว็บอัตโนมัติ:
+โปรเจกต์ตั้งค่า `netlify.toml` สำหรับ build และ deploy เว็บอัตโนมัติ:
 
-1. สร้าง GitHub repository แล้ว push โปรเจกต์นี้ขึ้น branch `main`
-2. ใน repository ไปที่ **Settings > Pages** แล้วเลือก **GitHub Actions** เป็น Build and deployment source
-3. push หรือ merge การเปลี่ยนแปลงเข้า `main` เพื่อเริ่ม deploy
-4. รอ workflow **Deploy to GitHub Pages** สำเร็จ จากนั้นเปิดลิงก์ที่แสดงใน **Settings > Pages**
+1. เข้าสู่ระบบ [Netlify](https://app.netlify.com/) แล้วเลือก **Add new site > Import an existing project**
+2. เชื่อมต่อ GitHub และเลือก repository ของเกม
+3. เลือก branch `main` แล้วกด **Deploy site** โดยใช้การตั้งค่าจาก `netlify.toml`
+4. เมื่อ deploy สำเร็จ Netlify จะแสดงลิงก์เว็บไซต์สำหรับแชร์ให้ผู้อื่น
 
-workflow จะกำหนด base path ตามชื่อ repository ให้โดยอัตโนมัติ รองรับทั้ง repository site (`username.github.io`) และ project site (`username.github.io/repository/`)
+Netlify จะ build และ deploy ใหม่อัตโนมัติเมื่อ push การเปลี่ยนแปลงเข้า branch `main` โดย build เว็บไว้ที่ `build/web` และใช้ base path ที่ root ของโดเมน Netlify
 
 ## Build เว็บด้วยตัวเอง
 
 ```bash
-flutter build web --release --base-href "/ชื่อ-repository/"
+flutter build web --release
 ```
 
-นำไฟล์ใน `build/web` ไปเผยแพร่บน static web host ได้ โดยเปลี่ยน base href ให้ตรงกับ path ที่ใช้โฮสต์
+นำไฟล์ใน `build/web` ไปเผยแพร่บน static web host ได้ โดยตั้ง base href ให้ตรงกับ path ที่ใช้โฮสต์หากไม่ได้ใช้ root ของโดเมน
