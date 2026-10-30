@@ -159,6 +159,197 @@ void main() {
     }
   });
 
+  testWidgets(
+    'supplied Kawasaki model images load instead of SVG silhouettes',
+    (WidgetTester tester) async {
+      const imageNames = {
+        'KLX140': 'kawasaki-klx140.png',
+        'KLX230': 'kawasaki-klx230.png',
+        'Ninja 125': 'kawasaki-ninja-125.png',
+        'Ninja 250': 'kawasaki-ninja-250.png',
+        'Ninja 400': 'kawasaki-ninja-400.png',
+        'Ninja 650': 'kawasaki-ninja-650.png',
+        'Ninja H2': 'kawasaki-ninja-h2.png',
+        'Ninja H2R': 'kawasaki-ninja-h2r.png',
+        'Ninja ZX-6R': 'kawasaki-ninja-zx-6r.png',
+        'Ninja ZX-10R': 'kawasaki-ninja-zx-10r.png',
+        'Versys 900': 'kawasaki-versys-900.png',
+        'W175': 'kawasaki-w175.png',
+        'Z125 Pro': 'kawasaki-z125-pro.png',
+        'Z250': 'kawasaki-z250.png',
+        'Z400': 'kawasaki-z400.png',
+        'Z650': 'kawasaki-z650.png',
+        'Z H2': 'kawasaki-z-h2.png',
+      };
+
+      for (final entry in imageNames.entries) {
+        final path = 'assets/bikes/${entry.value}';
+        expect((await rootBundle.load(path)).lengthInBytes, greaterThan(0));
+        final bike = brands['Kawasaki']!.$2.firstWhere(
+          (model) => model.name == entry.key,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(home: Scaffold(body: BikeImage(Drop(bike)))),
+        );
+        await tester.pumpAndSettle();
+
+        final image = tester.widget<Image>(find.byType(Image));
+        expect(
+          image.image,
+          isA<AssetImage>().having(
+            (asset) => asset.assetName,
+            'asset name',
+            path,
+          ),
+        );
+        expect(find.byType(SvgPicture), findsNothing);
+      }
+    },
+  );
+
+  testWidgets('supplied BMW model images load instead of SVG silhouettes', (
+    WidgetTester tester,
+  ) async {
+    const imageNames = {
+      'C 400 GT': 'bmw-c-400-gt.png',
+      'C 400 X': 'bmw-c-400-x.png',
+      'F 800 R': 'bmw-f-800-r.png',
+      'F 850 GS': 'bmw-f-850-gs.png',
+      'F 900 R': 'bmw-f-900-r.png',
+      'G 310 GS': 'bmw-g-310-gs.png',
+      'G 310 R': 'bmw-g-310-r.png',
+      'G 310 RR': 'bmw-g-310-rr.png',
+      'G 650 GS': 'bmw-g-650-gs.png',
+      'HP4 Race': 'bmw-hp4-race.png',
+      'K 1600 Grand America': 'bmw-k-1600-grand-america.png',
+      'M 1000 RR': 'bmw-m-1000-rr.png',
+      'R 1250 GS': 'bmw-r-1250-gs.png',
+      'R 1300 RT': 'bmw-r-1300-rt.png',
+      'R 18': 'bmw-r-18.png',
+      'R nineT': 'bmw-r-ninet.png',
+      'S 1000 RR': 'bmw-s-1000-rr.png',
+    };
+
+    for (final entry in imageNames.entries) {
+      final path = 'assets/bikes/${entry.value}';
+      expect((await rootBundle.load(path)).lengthInBytes, greaterThan(0));
+      final bike = brands['BMW']!.$2.firstWhere(
+        (model) => model.name == entry.key,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(home: Scaffold(body: BikeImage(Drop(bike)))),
+      );
+      await tester.pumpAndSettle();
+
+      final image = tester.widget<Image>(find.byType(Image));
+      expect(
+        image.image,
+        isA<AssetImage>().having(
+          (asset) => asset.assetName,
+          'asset name',
+          path,
+        ),
+      );
+      expect(find.byType(SvgPicture), findsNothing);
+    }
+  });
+
+  testWidgets('supplied Suzuki model images load instead of SVG silhouettes', (
+    WidgetTester tester,
+  ) async {
+    const imageNames = {
+      'Address 125': 'suzuki-address-125.png',
+      'Burgman Street': 'suzuki-burgman-street.png',
+      'Gixxer 155': 'suzuki-gixxer-155.png',
+      'GSX-8S': 'suzuki-gsx-8s.png',
+      'GSX-R1000R': 'suzuki-gsx-r1000r.png',
+      'GSX-R150': 'suzuki-gsx-r150.png',
+      'GSX-R400 JDM': 'suzuki-gsx-r400-jdm.png',
+      'GSX-R600': 'suzuki-gsx-r600.png',
+      'GSX-S150': 'suzuki-gsx-s150.png',
+      'GSX250R': 'suzuki-gsx250r.png',
+      'Hayabusa': 'suzuki-hayabusa.png',
+      'Hayabusa Gen 1': 'suzuki-hayabusa-gen-1.png',
+      'Katana': 'suzuki-katana.png',
+      'Raider R150': 'suzuki-raider-r150.png',
+      'RG500 Gamma': 'suzuki-rg500-gamma.png',
+      'SV650': 'suzuki-sv650.png',
+      'V-Strom 250': 'suzuki-v-strom-250.png',
+      'V-Strom 650': 'suzuki-v-strom-650.png',
+    };
+
+    for (final entry in imageNames.entries) {
+      final path = 'assets/bikes/${entry.value}';
+      expect((await rootBundle.load(path)).lengthInBytes, greaterThan(0));
+      final bike = brands['Suzuki']!.$2.firstWhere(
+        (model) => model.name == entry.key,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(home: Scaffold(body: BikeImage(Drop(bike)))),
+      );
+      await tester.pumpAndSettle();
+
+      final image = tester.widget<Image>(find.byType(Image));
+      expect(
+        image.image,
+        isA<AssetImage>().having(
+          (asset) => asset.assetName,
+          'asset name',
+          path,
+        ),
+      );
+      expect(find.byType(SvgPicture), findsNothing);
+    }
+  });
+
+  testWidgets('supplied Ducati model images load instead of SVG silhouettes', (
+    WidgetTester tester,
+  ) async {
+    const imageNames = {
+      'DesertX': 'ducati-desertx.png',
+      'Diavel V4': 'ducati-diavel-v4.png',
+      'Hypermotard 698': 'ducati-hypermotard-698.png',
+      'Monster 797': 'ducati-monster-797.png',
+      'Monster 821': 'ducati-monster-821.png',
+      'Monster 937': 'ducati-monster-937.png',
+      'Multistrada V4': 'ducati-multistrada-v4.png',
+      'Panigale V2': 'ducati-panigale-v2.png',
+      'Panigale V4': 'ducati-panigale-v4.png',
+      'Panigale V4 Lamborghini': 'ducati-panigale-v4-lamborghini.png',
+      'Scrambler Icon': 'ducati-scrambler-icon.png',
+      'Scrambler Sixty2': 'ducati-scrambler-sixty2.png',
+      'Streetfighter V4': 'ducati-streetfighter-v4.png',
+      'Superleggera V4': 'ducati-superleggera-v4.png',
+    };
+
+    for (final entry in imageNames.entries) {
+      final path = 'assets/bikes/${entry.value}';
+      expect((await rootBundle.load(path)).lengthInBytes, greaterThan(0));
+      final bike = brands['Ducati']!.$2.firstWhere(
+        (model) => model.name == entry.key,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(home: Scaffold(body: BikeImage(Drop(bike)))),
+      );
+      await tester.pumpAndSettle();
+
+      final image = tester.widget<Image>(find.byType(Image));
+      expect(
+        image.image,
+        isA<AssetImage>().having(
+          (asset) => asset.assetName,
+          'asset name',
+          path,
+        ),
+      );
+      expect(find.byType(SvgPicture), findsNothing);
+    }
+  });
+
   test('Wave 110i and Wave 125i stay under 80,000 baht', () {
     final hondaBikes = brands['Honda']!.$2;
     final wave110i = hondaBikes.firstWhere((bike) => bike.name == 'Wave110i');
@@ -174,17 +365,31 @@ void main() {
     final bikes = brands.values.expand((brand) => brand.$2);
     final goldBikes = bikes.where((bike) => bike.tier == Tier.gd).toList();
     final rc213v = goldBikes.singleWhere((bike) => bike.name == 'RC213V-S');
+    final bmwM1000Rr = goldBikes.singleWhere(
+      (bike) => bike.name == 'M 1000 RR',
+    );
+    final premiumGoldBikes = goldBikes.where((bike) => bike != bmwM1000Rr);
 
     expect(rc213v.value, 8000000);
+    expect(bmwM1000Rr.value, 999 * 520 + 45000);
     expect(goldBikes, isNotEmpty);
     expect(
-      goldBikes.every((bike) => bike.value >= 1000000),
+      premiumGoldBikes.every((bike) => bike.value >= 1000000),
       isTrue,
-      reason: goldBikes
+      reason: premiumGoldBikes
           .where((bike) => bike.value < 1000000)
           .map((bike) => '${bike.brand} ${bike.name}: ${bike.value}')
           .join(', '),
     );
+  });
+
+  test('BMW M 1000 RR is gold tier without changing its formula price', () {
+    final bike = brands['BMW']!.$2.singleWhere(
+      (bike) => bike.name == 'M 1000 RR',
+    );
+
+    expect(bike.tier, Tier.gd);
+    expect(bike.value, 999 * 520 + 45000);
   });
 
   test('Honda ADV and Forza models have the requested prices', () {
@@ -210,9 +415,7 @@ void main() {
     final click125i = hondaBikes.singleWhere(
       (bike) => bike.name == 'Click125i',
     );
-    final cbr250rr = hondaBikes.singleWhere(
-      (bike) => bike.name == 'CBR250RR',
-    );
+    final cbr250rr = hondaBikes.singleWhere((bike) => bike.name == 'CBR250RR');
 
     expect(click125i.value, 55600);
     expect(cbr250rr.value, 259000);
@@ -221,9 +424,7 @@ void main() {
 
   test('Honda CB1000 GT replaces NSR250R SP', () {
     final hondaBikes = brands['Honda']!.$2;
-    final cb1000Gt = hondaBikes.singleWhere(
-      (bike) => bike.name == 'CB1000 GT',
-    );
+    final cb1000Gt = hondaBikes.singleWhere((bike) => bike.name == 'CB1000 GT');
 
     expect(cb1000Gt.cc, 1000);
     expect(cb1000Gt.value, 514000);
@@ -273,12 +474,66 @@ void main() {
     expect(yamahaBikes.any((bike) => bike.name == 'MT-10'), isFalse);
   });
 
+  test('Kawasaki Versys 900 replaces Z900RS at the requested price', () {
+    final kawasakiBikes = brands['Kawasaki']!.$2;
+    final versys900 = kawasakiBikes.singleWhere(
+      (bike) => bike.name == 'Versys 900',
+    );
+
+    expect(versys900.cc, 900);
+    expect(versys900.value, 484900);
+    expect(kawasakiBikes.any((bike) => bike.name == 'Z900RS'), isFalse);
+  });
+
   test('Honda Goldwing is gold tier', () {
     final goldwing = brands['Honda']!.$2.singleWhere(
       (bike) => bike.name == 'Goldwing',
     );
 
     expect(goldwing.tier, Tier.gd);
+  });
+
+  test(
+    'BMW R 1300 RT and K 1600 Grand America are gold tier at listed prices',
+    () {
+      final bmwBikes = {for (final bike in brands['BMW']!.$2) bike.name: bike};
+      final r1300Rt = bmwBikes['R 1300 RT']!;
+      final k1600GrandAmerica = bmwBikes['K 1600 Grand America']!;
+
+      expect(r1300Rt.value, 1439000);
+      expect(r1300Rt.tier, Tier.gd);
+      expect(k1600GrandAmerica.value, 1775000);
+      expect(k1600GrandAmerica.tier, Tier.gd);
+    },
+  );
+
+  test('Suzuki Hayabusa Gen 1 replaces Katana 1100 Ltd', () {
+    final suzukiBikes = brands['Suzuki']!.$2;
+    final hayabusaGen1 = suzukiBikes.singleWhere(
+      (bike) => bike.name == 'Hayabusa Gen 1',
+    );
+
+    expect(hayabusaGen1.cc, 1298);
+    expect(hayabusaGen1.value, 1500000);
+    expect(hayabusaGen1.tier, Tier.gd);
+    expect(suzukiBikes.any((bike) => bike.name == 'Katana 1100 Ltd'), isFalse);
+    expect(suzukiBikes.any((bike) => bike.name == 'Hayabusa'), isTrue);
+  });
+
+  test('Ducati Panigale V4 Lamborghini replaces Desmosedici Stradale', () {
+    final ducatiBikes = brands['Ducati']!.$2;
+    final panigaleV4Lamborghini = ducatiBikes.singleWhere(
+      (bike) => bike.name == 'Panigale V4 Lamborghini',
+    );
+
+    expect(panigaleV4Lamborghini.cc, 1103);
+    expect(panigaleV4Lamborghini.value, 8000000);
+    expect(panigaleV4Lamborghini.tier, Tier.gd);
+    expect(
+      ducatiBikes.any((bike) => bike.name == 'Desmosedici Stradale'),
+      isFalse,
+    );
+    expect(ducatiBikes.any((bike) => bike.name == 'Panigale V4'), isTrue);
   });
 
   testWidgets('home shows unique collection progress for each tier', (
@@ -297,6 +552,77 @@ void main() {
     expect(find.text('ความคืบหน้าการสะสม'), findsOneWidget);
     expect(find.text('สะสม $collected/$total'), findsOneWidget);
     expect(collectionProgress().keys, containsAll(Tier.values));
+  });
+
+  testWidgets('coin mini-game awards coin tokens for 30 seconds', (
+    WidgetTester tester,
+  ) async {
+    tokens.value = 0;
+    await tester.pumpWidget(const MotoCaseApp());
+    await tester.tap(find.byKey(const ValueKey('coin-game-button')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+
+    expect(find.text('เก็บเหรียญรับ Token'), findsOneWidget);
+    expect(find.text('00:30'), findsOneWidget);
+    final coinFinder = find.byKey(const ValueKey('token-coin-0'));
+    final rewardText = tester.widget<Text>(
+      find.byKey(const ValueKey('token-coin-reward-0')),
+    );
+    final reward = int.parse(rewardText.data!.substring(1));
+    final fieldFinder = find.byKey(const ValueKey('coin-game-field'));
+    final fieldSize = tester.getSize(fieldFinder);
+    expect(fieldSize.width, greaterThan(300));
+
+    expect(
+      find.ancestor(of: coinFinder, matching: find.byType(Tooltip)),
+      findsNothing,
+    );
+
+    await tester.tap(coinFinder);
+    await tester.pump();
+
+    expect(reward, anyOf(1, 3, 5));
+    expect(tokens.value, reward);
+    expect(find.text('เก็บได้ $reward Token'), findsOneWidget);
+    expect(coinFinder, findsNothing);
+    expect(find.byKey(const ValueKey('token-coin-4')), findsOneWidget);
+    expect(tester.getSize(fieldFinder), fieldSize);
+
+    final otherCoinReward = int.parse(
+      tester
+          .widget<Text>(find.byKey(const ValueKey('token-coin-reward-4')))
+          .data!
+          .substring(1),
+    );
+    await tester.tap(find.byKey(const ValueKey('token-coin-4')));
+    await tester.pump();
+    expect(tokens.value, reward + otherCoinReward);
+    expect(find.byKey(const ValueKey('token-coin-4')), findsNothing);
+    expect(tester.getSize(fieldFinder), fieldSize);
+
+    await tester.pump(const Duration(milliseconds: 999));
+    expect(coinFinder, findsNothing);
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(coinFinder, findsOneWidget);
+    final respawnedPosition = tester.widget<Positioned>(
+      find.ancestor(of: coinFinder, matching: find.byType(Positioned)),
+    );
+    expect(respawnedPosition.top, isNot(14.0 + (0 % 3) * 102));
+
+    final nextRewardText = tester.widget<Text>(
+      find.byKey(const ValueKey('token-coin-reward-0')),
+    );
+    final nextReward = int.parse(nextRewardText.data!.substring(1));
+    await tester.tap(coinFinder);
+    await tester.pump();
+    final expectedTokens = reward + otherCoinReward + nextReward;
+    expect(tokens.value, expectedTokens);
+    expect(find.text('เก็บได้ $expectedTokens Token'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 30));
+    expect(find.text('หมดเวลา! ได้ $expectedTokens Token'), findsOneWidget);
+    expect(find.byKey(const ValueKey('coin-game-restart')), findsOneWidget);
   });
 
   testWidgets('admin can add tokens after entering the correct password', (
@@ -364,7 +690,7 @@ void main() {
     );
   });
 
-  testWidgets('win a token and use it to open a standard case', (
+  testWidgets('earn a token in the coin game and use it to open a case', (
     WidgetTester tester,
   ) async {
     tokens.value = 0;
@@ -372,6 +698,7 @@ void main() {
 
     expect(find.text('MOTOCASE'), findsOneWidget);
     expect(find.text('Token: 0'), findsOneWidget);
+    expect(find.text('เล่น X/O'), findsNothing);
     expect(find.text('Honda'), findsOneWidget);
     expect(find.text('📦'), findsNothing);
     for (final brand in brands.keys) {
@@ -382,7 +709,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('กล่อง Honda'), findsOneWidget);
-    expect(find.text('เปิดกล่อง (1 Token)'), findsOneWidget);
+    expect(find.text('เปิดกล่อง (20 Token)'), findsOneWidget);
     expect(find.text('มูลค่ารวมของกล่องนี้: ฿0'), findsOneWidget);
     expect(find.text('Token คงเหลือ: 0'), findsOneWidget);
     expect(find.textContaining('cc'), findsNothing);
@@ -391,68 +718,35 @@ void main() {
     expect(
       tester
           .widget<FilledButton>(
-            find.widgetWithText(FilledButton, 'เปิดกล่อง (1 Token)'),
+            find.widgetWithText(FilledButton, 'เปิดกล่อง (20 Token)'),
           )
           .onPressed,
       isNull,
     );
 
-    await tester.tap(find.textContaining('เล่น X/O เพื่อรับ Token'));
-    await tester.pumpAndSettle();
-    expect(find.text('ชนะ X/O รับ 1 Token'), findsOneWidget);
-
-    for (final index in [0, 2, 4, 8]) {
-      await tester.tap(find.byKey(ValueKey('tic-cell-$index')));
-      await tester.pump();
-    }
-
-    expect(find.text('ชนะ! ได้รับ 1 Token'), findsOneWidget);
-    expect(find.text('Token: 1'), findsOneWidget);
-
-    await tester.tap(find.text('เล่นอีกครั้ง'));
+    await tester.tap(find.text('ไม่มี Token? เก็บเหรียญเพื่อรับ Token'));
     await tester.pump();
-    expect(find.text('CPU เริ่มก่อน (O) · คุณเล่น X'), findsOneWidget);
-    expect(
-      tester
-          .widget<FilledButton>(find.byKey(const ValueKey('tic-cell-4')))
-          .child,
-      isA<Text>().having((text) => text.data, 'cell mark', 'O'),
+    await tester.pump(const Duration(milliseconds: 350));
+    final coinFinder = find.byKey(const ValueKey('token-coin-0'));
+    final rewardText = tester.widget<Text>(
+      find.byKey(const ValueKey('token-coin-reward-0')),
     );
-
-    while (find.text('CPU เริ่มก่อน (O) · คุณเล่น X').evaluate().isNotEmpty) {
-      final emptyCell = List.generate(9, (index) => index).firstWhere(
-        (index) =>
-            (tester
-                        .widget<FilledButton>(
-                          find.byKey(ValueKey('tic-cell-$index')),
-                        )
-                        .child
-                    as Text)
-                .data!
-                .isEmpty,
-      );
-      await tester.tap(find.byKey(ValueKey('tic-cell-$emptyCell')));
-      await tester.pump();
-    }
-
-    await tester.tap(find.text('เล่นอีกครั้ง'));
+    final reward = int.parse(rewardText.data!.substring(1));
+    await tester.tap(coinFinder);
     await tester.pump();
-    expect(find.text('คุณเริ่มก่อน (X) · CPU เล่น O'), findsOneWidget);
-    expect(
-      tester
-          .widget<FilledButton>(find.byKey(const ValueKey('tic-cell-4')))
-          .child,
-      isA<Text>().having((text) => text.data, 'cell mark', ''),
-    );
-
-    await tester.pageBack();
+    expect(tokens.value, reward);
+    Navigator.of(
+      tester.element(find.byKey(const ValueKey('coin-game-timer'))),
+    ).pop();
     await tester.pumpAndSettle();
-    expect(find.text('Token คงเหลือ: 1'), findsOneWidget);
+    expect(find.text('Token คงเหลือ: $reward'), findsOneWidget);
 
-    await tester.tap(find.text('เปิดกล่อง (1 Token)'));
+    tokens.value += 20;
+    await tester.pump();
+    await tester.tap(find.text('เปิดกล่อง (20 Token)'));
     await tester.pumpAndSettle(const Duration(milliseconds: 100));
 
-    expect(find.text('Token คงเหลือ: 0'), findsOneWidget);
+    expect(find.text('Token คงเหลือ: $reward'), findsOneWidget);
     expect(find.text('มูลค่ารวมของกล่องนี้: ฿0'), findsNothing);
     expect(find.textContaining('มูลค่ารวมของกล่องนี้: ฿'), findsOneWidget);
     expect(find.textContaining('มูลค่า ฿'), findsWidgets);
@@ -460,70 +754,105 @@ void main() {
     expect(find.textContaining('Pattern:'), findsNothing);
   });
 
-  testWidgets('Ducati cases cost 20 tokens to open', (
+  testWidgets('Ducati cases cost 100 tokens to open', (
     WidgetTester tester,
   ) async {
-    tokens.value = 19;
+    tokens.value = 99;
     await tester.pumpWidget(const MotoCaseApp());
     await tester.ensureVisible(find.text('Ducati'));
     await tester.tap(find.text('Ducati'));
     await tester.pumpAndSettle();
 
-    expect(find.text('เปิดกล่อง (20 Token)'), findsOneWidget);
+    expect(find.text('เปิดกล่อง (100 Token)'), findsOneWidget);
     expect(
       tester
           .widget<FilledButton>(
-            find.widgetWithText(FilledButton, 'เปิดกล่อง (20 Token)'),
+            find.widgetWithText(FilledButton, 'เปิดกล่อง (100 Token)'),
           )
           .onPressed,
       isNull,
     );
 
-    tokens.value = 20;
+    tokens.value = 100;
     await tester.pump();
     expect(
       tester
           .widget<FilledButton>(
-            find.widgetWithText(FilledButton, 'เปิดกล่อง (20 Token)'),
+            find.widgetWithText(FilledButton, 'เปิดกล่อง (100 Token)'),
           )
           .onPressed,
       isNotNull,
     );
 
-    await tester.tap(find.text('เปิดกล่อง (20 Token)'));
+    await tester.tap(find.text('เปิดกล่อง (100 Token)'));
     await tester.pumpAndSettle(const Duration(milliseconds: 100));
     expect(find.text('Token คงเหลือ: 0'), findsOneWidget);
   });
 
-  testWidgets('BMW cases cost 15 tokens to open', (WidgetTester tester) async {
-    tokens.value = 14;
+  testWidgets('BMW cases cost 80 tokens to open', (WidgetTester tester) async {
+    tokens.value = 79;
     await tester.pumpWidget(const MotoCaseApp());
     await tester.tap(find.text('BMW'));
     await tester.pumpAndSettle();
 
-    expect(find.text('เปิดกล่อง (15 Token)'), findsOneWidget);
+    expect(find.text('เปิดกล่อง (80 Token)'), findsOneWidget);
     expect(
       tester
           .widget<FilledButton>(
-            find.widgetWithText(FilledButton, 'เปิดกล่อง (15 Token)'),
+            find.widgetWithText(FilledButton, 'เปิดกล่อง (80 Token)'),
           )
           .onPressed,
       isNull,
     );
 
-    tokens.value = 15;
+    tokens.value = 80;
     await tester.pump();
     expect(
       tester
           .widget<FilledButton>(
-            find.widgetWithText(FilledButton, 'เปิดกล่อง (15 Token)'),
+            find.widgetWithText(FilledButton, 'เปิดกล่อง (80 Token)'),
           )
           .onPressed,
       isNotNull,
     );
 
-    await tester.tap(find.text('เปิดกล่อง (15 Token)'));
+    await tester.tap(find.text('เปิดกล่อง (80 Token)'));
     await tester.pumpAndSettle(const Duration(milliseconds: 100));
     expect(find.text('Token คงเหลือ: 0'), findsOneWidget);
+  });
+
+  testWidgets('Yamaha, Kawasaki, and Suzuki cases use their token rates', (
+    WidgetTester tester,
+  ) async {
+    const tokenCosts = {'Yamaha': 25, 'Kawasaki': 30, 'Suzuki': 40};
+
+    for (final entry in tokenCosts.entries) {
+      tokens.value = entry.value - 1;
+      await tester.pumpWidget(const MotoCaseApp());
+      await tester.ensureVisible(find.text(entry.key));
+      await tester.tap(find.text(entry.key));
+      await tester.pumpAndSettle();
+
+      final buttonText = 'เปิดกล่อง (${entry.value} Token)';
+      expect(find.text(buttonText), findsOneWidget);
+      expect(
+        tester
+            .widget<FilledButton>(find.widgetWithText(FilledButton, buttonText))
+            .onPressed,
+        isNull,
+      );
+
+      tokens.value = entry.value;
+      await tester.pump();
+      expect(
+        tester
+            .widget<FilledButton>(find.widgetWithText(FilledButton, buttonText))
+            .onPressed,
+        isNotNull,
+      );
+
+      Navigator.of(tester.element(find.text('กล่อง ${entry.key}'))).pop();
+      await tester.pumpAndSettle();
+    }
   });
 }

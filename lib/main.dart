@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:math';
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -65,7 +67,7 @@ final _modelPrices = <String, int>{
   'kawasaki ninja 250': 181500,
   'kawasaki z650': 366000,
   'kawasaki ninja zx 6r': 513000,
-  'kawasaki z900rs': 640000,
+  'kawasaki versys 900': 484900,
   'kawasaki ninja zx 10r': 957000,
   'kawasaki ninja h2': 980000,
   'kawasaki ninja h2r': 5000000,
@@ -77,6 +79,8 @@ final _modelPrices = <String, int>{
   'bmw f 800 r': 379000,
   'bmw s 1000 rr': 676000,
   'bmw r 1250 gs': 786000,
+  'bmw r 1300 rt': 1439000,
+  'bmw k 1600 grand america': 1775000,
   'bmw r 18': 930000,
   'bmw hp4 race': 5000000,
   'ducati monster 821': 435000,
@@ -86,16 +90,16 @@ final _modelPrices = <String, int>{
   'ducati desertx': 619000,
   'ducati multistrada v4': 890000,
   'ducati superleggera v4': 4000000,
-  'ducati desmosedici stradale': 8000000,
+  'ducati panigale v4 lamborghini': 8000000,
   'suzuki gsx r150': 90000,
   'suzuki gsx s150': 93000,
   'suzuki v strom 250': 158000,
   'suzuki gsx250r': 176000,
   'suzuki sv650': 362000,
   'suzuki hayabusa': 820000,
+  'suzuki hayabusa gen 1': 1500000,
   'suzuki gsx r1000r': 990000,
   'suzuki rg500 gamma': 1500000,
-  'suzuki katana 1100 ltd': 1500000,
 };
 
 class Bike {
@@ -133,7 +137,7 @@ class Bike {
       .replaceAll(RegExp(r'^-|-$'), '');
 }
 
-// 'ชื่อรุ่น|cc|g(ถ้าเป็นรุ่นลิมิเต็ด/หายาก)'
+// 'ชื่อรุ่น|cc|g'
 const _raw = {
   'Honda': (
     0xFFE60012,
@@ -145,19 +149,19 @@ const _raw = {
   ),
   'Kawasaki': (
     0xFF3FA535,
-    'Z125 Pro|125,Ninja 125|125,KLX140|144,W175|177,KLX230|233,Ninja 250|249,Z250|249,Ninja 400|399,Z400|399,Z650|649,Ninja 650|649,Ninja ZX-6R|636,Z900RS|948,Z H2|998,Ninja ZX-10R|998,Ninja H2|998,Ninja H2R|998|g',
+    'Z125 Pro|125,Ninja 125|125,KLX140|144,W175|177,KLX230|233,Ninja 250|249,Z250|249,Ninja 400|399,Z400|399,Z650|649,Ninja 650|649,Ninja ZX-6R|636,Versys 900|900,Z H2|998,Ninja ZX-10R|998,Ninja H2|998,Ninja H2R|998|g',
   ),
   'BMW': (
     0xFF2D7FF9,
-    'G 310 R|313,G 310 GS|313,G 310 RR|312,C 400 X|350,C 400 GT|350,G 650 GS|652,F 800 R|798,F 850 GS|853,F 900 R|895,S 1000 RR|999,R 1250 GS|1254,R nineT|1170,R 18|1802,M 1000 RR|999,HP4 Race|999|g',
+    'G 310 R|313,G 310 GS|313,G 310 RR|312,C 400 X|350,C 400 GT|350,G 650 GS|652,F 800 R|798,F 850 GS|853,F 900 R|895,S 1000 RR|999,R 1250 GS|1254,R 1300 RT|1300|g,R nineT|1170,R 18|1802,K 1600 Grand America|1649|g,M 1000 RR|999|g,HP4 Race|999|g',
   ),
   'Ducati': (
     0xFFE10600,
-    'Scrambler Sixty2|399,Monster 797|797,Hypermotard 698|698,Scrambler Icon|803,Monster 821|821,Monster 937|937,DesertX|937,Panigale V2|955,Panigale V4|1103,Streetfighter V4|1103,Multistrada V4|1158,Diavel V4|1158,Superleggera V4|1103|g,Desmosedici Stradale|1000|g',
+    'Scrambler Sixty2|399,Monster 797|797,Hypermotard 698|698,Scrambler Icon|803,Monster 821|821,Monster 937|937,DesertX|937,Panigale V2|955,Panigale V4|1103,Streetfighter V4|1103,Multistrada V4|1158,Diavel V4|1158,Superleggera V4|1103|g,Panigale V4 Lamborghini|1103|g',
   ),
   'Suzuki': (
     0xFF2A52D6,
-    'Address 125|125,Burgman Street|125,Raider R150|147,GSX-R150|147,GSX-S150|147,Gixxer 155|155,V-Strom 250|248,GSX250R|248,GSX-R400 JDM|399,GSX-R600|599,V-Strom 650|645,SV650|645,GSX-8S|776,Katana|999,GSX-R1000R|999,Hayabusa|1340,RG500 Gamma|498|g,Katana 1100 Ltd|1100|g',
+    'Address 125|125,Burgman Street|125,Raider R150|147,GSX-R150|147,GSX-S150|147,Gixxer 155|155,V-Strom 250|248,GSX250R|248,GSX-R400 JDM|399,GSX-R600|599,V-Strom 650|645,SV650|645,GSX-8S|776,Katana|999,GSX-R1000R|999,Hayabusa|1340,RG500 Gamma|498|g,Hayabusa Gen 1|1298|g',
   ),
 };
 
@@ -549,35 +553,41 @@ class HomePage extends StatelessWidget {
                         horizontal: 20,
                         vertical: 14,
                       ),
-                      child: Row(
+                      child: Column(
                         children: [
-                          const Icon(
-                            Icons.token,
-                            color: Color(0xFFFFC933),
-                            size: 26,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: ValueListenableBuilder<int>(
-                              valueListenable: tokens,
-                              builder: (_, count, _) => Text(
-                                'Token: $count',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.token,
+                                color: Color(0xFFFFC933),
+                                size: 26,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: ValueListenableBuilder<int>(
+                                  valueListenable: tokens,
+                                  builder: (_, count, _) => Text(
+                                    'Token: $count',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
+                          const SizedBox(height: 10),
                           FilledButton.icon(
+                            key: const ValueKey('coin-game-button'),
                             onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const TicTacToePage(),
+                                builder: (_) => const TokenCoinGamePage(),
                               ),
                             ),
-                            icon: const Icon(Icons.sports_esports),
-                            label: const Text('เล่น X/O'),
+                            icon: const Icon(Icons.paid),
+                            label: const Text('เก็บเหรียญ'),
                           ),
                         ],
                       ),
@@ -598,7 +608,7 @@ class HomePage extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'สะสม Token จากเกม X/O แล้วเปิดกล่องเพื่อลุ้นรับรถ',
+                        'เล่นมินิเกมสะสม Token แล้วเปิดกล่องเพื่อลุ้นรับรถ',
                         style: TextStyle(color: Colors.white60, fontSize: 14),
                       ),
                     ],
@@ -792,154 +802,343 @@ class _AdminTokenDialogState extends State<AdminTokenDialog> {
   );
 }
 
-class TicTacToePage extends StatefulWidget {
-  const TicTacToePage({super.key});
+class TokenCoinGamePage extends StatefulWidget {
+  const TokenCoinGamePage({super.key});
 
   @override
-  State<TicTacToePage> createState() => _TicTacToePageState();
+  State<TokenCoinGamePage> createState() => _TokenCoinGamePageState();
 }
 
-class _TicTacToePageState extends State<TicTacToePage> {
-  static const _wins = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
+class _TokenCoinGamePageState extends State<TokenCoinGamePage>
+    with TickerProviderStateMixin {
+  static const _coinCount = 9;
+  static const _gameDuration = 30;
+  static const _coinSize = 68.0;
+  static const _coinRewards = [1, 3, 5];
+  static const _coinColors = {
+    1: Color(0xFFCD7F32),
+    3: Color(0xFFC0C8D0),
+    5: Color(0xFFFFC933),
+  };
+  static const _coinNames = {1: 'ทองแดง', 3: 'เงิน', 5: 'ทอง'};
 
-  List<String?> board = List.filled(9, null);
-  String? result;
-  bool cpuStartsThisRound = false;
+  late final List<AnimationController> _coinControllers;
+  late final List<ValueNotifier<(int, int, bool)>> _coins;
+  final _roundTokens = ValueNotifier<int>(0);
+  final List<Timer?> _respawnTimers = List.filled(_coinCount, null);
+  Timer? _countdown;
+  int _secondsLeft = _gameDuration;
+  bool _isPlaying = true;
 
-  String? _winner(List<String?> cells) {
-    for (final line in _wins) {
-      final mark = cells[line[0]];
-      if (mark != null && mark == cells[line[1]] && mark == cells[line[2]]) {
-        return mark;
-      }
-    }
-    return null;
-  }
-
-  int? _findWinningMove(String mark) {
-    for (var i = 0; i < board.length; i++) {
-      if (board[i] != null) continue;
-      final trial = List<String?>.of(board)..[i] = mark;
-      if (_winner(trial) == mark) return i;
-    }
-    return null;
-  }
-
-  void _play(int index) {
-    if (result != null || board[index] != null) return;
-    setState(() {
-      board[index] = 'X';
-      if (_winner(board) == 'X') {
-        result = 'ชนะ! ได้รับ 1 Token';
-        tokens.value++;
-        return;
-      }
-      if (board.every((cell) => cell != null)) {
-        result = 'เสมอ ลองใหม่อีกครั้ง';
-        return;
-      }
-
-      final cpuMove =
-          _findWinningMove('O') ??
-          _findWinningMove('X') ??
-          board.indexWhere((cell) => cell == null);
-      board[cpuMove] = 'O';
-      if (_winner(board) == 'O') {
-        result = 'CPU ชนะ ลองใหม่อีกครั้ง';
-      } else if (board.every((cell) => cell != null)) {
-        result = 'เสมอ ลองใหม่อีกครั้ง';
+  @override
+  void initState() {
+    super.initState();
+    _coins = List.generate(
+      _coinCount,
+      (index) => ValueNotifier((
+        _coinRewards[_rnd.nextInt(_coinRewards.length)],
+        index % 3,
+        true,
+      )),
+    );
+    _coinControllers = List.generate(_coinCount, (index) {
+      final controller = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 1800 + index * 190),
+      );
+      controller.value = (index ~/ 3 + 1) / 4;
+      return controller..repeat(reverse: true);
+    });
+    _countdown = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (_secondsLeft <= 1) {
+        _finishGame();
+      } else {
+        setState(() => _secondsLeft--);
       }
     });
   }
 
-  void _reset() {
+  @override
+  void dispose() {
+    _countdown?.cancel();
+    for (final timer in _respawnTimers) {
+      timer?.cancel();
+    }
+    _roundTokens.dispose();
+    for (final coin in _coins) {
+      coin.dispose();
+    }
+    for (final controller in _coinControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _finishGame() {
+    _countdown?.cancel();
+    for (final timer in _respawnTimers) {
+      timer?.cancel();
+    }
+    for (final controller in _coinControllers) {
+      controller.stop();
+    }
     setState(() {
-      cpuStartsThisRound = !cpuStartsThisRound;
-      board = List.filled(9, null);
-      result = null;
-      if (cpuStartsThisRound) board[4] = 'O';
+      _secondsLeft = 0;
+      _isPlaying = false;
+    });
+  }
+
+  void _collectCoin(int index) {
+    final coin = _coins[index].value;
+    if (!_isPlaying || !coin.$3) return;
+
+    final reward = coin.$1;
+    _coins[index].value = (reward, coin.$2, false);
+    _roundTokens.value += reward;
+    tokens.value += reward;
+    _respawnTimers[index] = Timer(const Duration(seconds: 1), () {
+      if (!mounted || !_isPlaying) return;
+      final previousLane = _coins[index].value.$2;
+      final nextLaneOffset = 1 + _rnd.nextInt(2);
+      _coins[index].value = (
+        _coinRewards[_rnd.nextInt(_coinRewards.length)],
+        (previousLane + nextLaneOffset) % 3,
+        true,
+      );
+    });
+  }
+
+  void _restartGame() {
+    for (final timer in _respawnTimers) {
+      timer?.cancel();
+    }
+    setState(() {
+      _roundTokens.value = 0;
+      _secondsLeft = _gameDuration;
+      _isPlaying = true;
+      for (var i = 0; i < _coinCount; i++) {
+        _coins[i].value = (
+          _coinRewards[_rnd.nextInt(_coinRewards.length)],
+          _rnd.nextInt(3),
+          true,
+        );
+      }
+    });
+    for (var i = 0; i < _coinControllers.length; i++) {
+      _coinControllers[i]
+        ..reset()
+        ..repeat(reverse: true);
+    }
+    _countdown = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (_secondsLeft <= 1) {
+        _finishGame();
+      } else {
+        setState(() => _secondsLeft--);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('ชนะ X/O รับ 1 Token')),
-    body: Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ValueListenableBuilder<int>(
-              valueListenable: tokens,
-              builder: (_, count, _) => Text(
-                'Token: $count',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+    appBar: AppBar(title: const Text('เก็บเหรียญรับ Token')),
+    body: LayoutBuilder(
+      builder: (context, constraints) => Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: min(max(0.0, constraints.maxWidth - 40), 760),
+              maxWidth: min(max(0.0, constraints.maxWidth - 40), 760),
+              minHeight: max(0, constraints.maxHeight - 40),
             ),
-            const SizedBox(height: 8),
-            Text(
-              result ??
-                  (cpuStartsThisRound
-                      ? 'CPU เริ่มก่อน (O) · คุณเล่น X'
-                      : 'คุณเริ่มก่อน (X) · CPU เล่น O'),
-              style: const TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: 320,
-              height: 320,
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ValueListenableBuilder<int>(
+                      valueListenable: _roundTokens,
+                      builder: (context, roundTokens, _) => Text(
+                        'เก็บได้ $roundTokens Token',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      key: const ValueKey('coin-game-timer'),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _secondsLeft <= 5
+                            ? const Color(0xFF7F2525)
+                            : const Color(0xFF1F2630),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '00:${_secondsLeft.toString().padLeft(2, '0')}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                itemCount: board.length,
-                itemBuilder: (_, index) => FilledButton(
-                  key: ValueKey('tic-cell-$index'),
-                  onPressed: result == null ? () => _play(index) : null,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF1F2630),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 8),
+                const Text(
+                  'แตะเหรียญที่กำลังเคลื่อนที่เพื่อเก็บ Token',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 16,
+                  runSpacing: 8,
+                  children: [
+                    for (final reward in _coinRewards)
+                      Text(
+                        '${_coinNames[reward]} +$reward Token',
+                        style: TextStyle(color: _coinColors[reward]),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                LayoutBuilder(
+                  builder: (context, box) => Container(
+                    key: const ValueKey('coin-game-field'),
+                    width: double.infinity,
+                    height: 330,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xFF1D5963), Color(0xFF102B3B)],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: const Color(0xFF4D9291)),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        for (var i = 0; i < _coinCount; i++)
+                          AnimatedBuilder(
+                            animation: Listenable.merge([
+                              _coinControllers[i],
+                              _coins[i],
+                            ]),
+                            builder: (context, _) {
+                              final (reward, lane, visible) = _coins[i].value;
+                              if (!visible) {
+                                return const SizedBox.shrink();
+                              }
+
+                              final travelDistance = max(
+                                0.0,
+                                box.maxWidth - _coinSize,
+                              );
+                              final progress = _coinControllers[i].value;
+                              final direction = i.isEven
+                                  ? progress
+                                  : 1 - progress;
+                              final left = direction * travelDistance;
+                              final top = 14.0 + lane * 102;
+                              final color = _coinColors[reward]!;
+
+                              return Positioned(
+                                left: left,
+                                top: top,
+                                child: GestureDetector(
+                                  key: ValueKey('token-coin-$i'),
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () => _collectCoin(i),
+                                  child: Container(
+                                    width: _coinSize,
+                                    height: _coinSize,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: RadialGradient(
+                                        colors: [
+                                          Color.lerp(color, Colors.white, .35)!,
+                                          color,
+                                          Color.lerp(color, Colors.black, .4)!,
+                                        ],
+                                        stops: const [0, .68, 1],
+                                      ),
+                                      border: Border.all(
+                                        color: Colors.white70,
+                                        width: 2,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: color.withValues(alpha: .45),
+                                          blurRadius: 12,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.token,
+                                          color: Color(0xFF382710),
+                                          size: 28,
+                                        ),
+                                        Text(
+                                          key: ValueKey('token-coin-reward-$i'),
+                                          '+$reward',
+                                          style: const TextStyle(
+                                            color: Color(0xFF382710),
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        if (!_isPlaying)
+                          Positioned.fill(
+                            child: ColoredBox(
+                              color: const Color(0xCC0E1116),
+                              child: Center(
+                                child: Text(
+                                  'หมดเวลา! ได้ ${_roundTokens.value} Token',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                  child: Text(
-                    board[index] ?? '',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: board[index] == 'X'
-                          ? const Color(0xFF6EC6FF)
-                          : const Color(0xFFFF4FA3),
-                    ),
-                  ),
                 ),
-              ),
+                if (!_isPlaying) ...[
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    key: const ValueKey('coin-game-restart'),
+                    onPressed: _restartGame,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('เล่นอีกครั้ง'),
+                  ),
+                ],
+              ],
             ),
-            const SizedBox(height: 20),
-            if (result != null)
-              OutlinedButton.icon(
-                onPressed: _reset,
-                icon: const Icon(Icons.refresh),
-                label: const Text('เล่นอีกครั้ง'),
-              ),
-          ],
+          ),
         ),
       ),
     ),
@@ -1000,8 +1199,12 @@ class CasePage extends StatefulWidget {
 class _CasePageState extends State<CasePage> {
   static const itemW = 160.0; // กว้างการ์ด 150 + margin 10
   int get tokenCost => switch (widget.brand) {
-    'Ducati' => 20,
-    'BMW' => 15,
+    'Honda' => 20,
+    'Yamaha' => 25,
+    'BMW' => 80,
+    'Ducati' => 100,
+    'Kawasaki' => 30,
+    'Suzuki' => 40,
     _ => 1,
   };
   final sc = ScrollController();
@@ -1041,8 +1244,7 @@ class _CasePageState extends State<CasePage> {
     });
     sc.jumpTo(0);
     await WidgetsBinding.instance.endOfFrame;
-    final target =
-        w * itemW + itemW / 2 - vw / 2 + (_rnd.nextDouble() - .5) * 110;
+    final target = w * itemW + itemW / 2 - vw / 2;
     await sc.animateTo(
       target,
       duration: const Duration(milliseconds: 6500),
@@ -1249,33 +1451,94 @@ class _CasePageState extends State<CasePage> {
                         ),
                         const SizedBox(height: 12),
                       ],
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            height: 190,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF171C24),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: ListView.builder(
-                                controller: sc,
-                                scrollDirection: Axis.horizontal,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemExtent: itemW,
-                                itemCount: strip.length,
-                                itemBuilder: (_, i) => ItemCard(strip[i]),
+                      AnimatedScale(
+                        scale: busy ? 1.1 : 1,
+                        duration: const Duration(milliseconds: 450),
+                        curve: Curves.easeOutCubic,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 450),
+                              height: 190,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF171C24),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: busy
+                                      ? const Color(0xFFFFC933)
+                                      : Colors.transparent,
+                                  width: 2,
+                                ),
+                                boxShadow: busy
+                                    ? [
+                                        BoxShadow(
+                                          color: const Color(
+                                            0xFFFFC933,
+                                          ).withValues(alpha: .3),
+                                          blurRadius: 24,
+                                          spreadRadius: 2,
+                                        ),
+                                      ]
+                                    : const [],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: ListView.builder(
+                                  controller: sc,
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemExtent: itemW,
+                                  itemCount: strip.length,
+                                  itemBuilder: (_, i) {
+                                    final card = ItemCard(strip[i]);
+                                    if (!busy) return card;
+
+                                    return AnimatedBuilder(
+                                      animation: sc,
+                                      child: card,
+                                      builder: (context, child) {
+                                        final offset = sc.hasClients
+                                            ? sc.offset
+                                            : 0.0;
+                                        final cardCenter =
+                                            i * itemW + itemW / 2 - offset;
+                                        final distance =
+                                            (cardCenter -
+                                                    (box.maxWidth - 24) / 2)
+                                                .abs();
+                                        final focus =
+                                            (1 - distance / (itemW * 1.5))
+                                                .clamp(0.0, 1.0)
+                                                .toDouble();
+                                        final blur = (1 - focus) * 4;
+
+                                        return Opacity(
+                                          opacity: .55 + focus * .45,
+                                          child: Transform.scale(
+                                            scale: 1 + focus * .025,
+                                            child: ImageFiltered(
+                                              imageFilter: ImageFilter.blur(
+                                                sigmaX: blur,
+                                                sigmaY: blur,
+                                              ),
+                                              child: child,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            width: 3,
-                            height: 190,
-                            color: const Color(0xFFFFC933),
-                          ), // เข็มชี้
-                        ],
+                            Container(
+                              width: 3,
+                              height: 190,
+                              color: const Color(0xFFFFC933),
+                            ), // เข็มชี้
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 16),
                       ValueListenableBuilder<int>(
@@ -1309,12 +1572,12 @@ class _CasePageState extends State<CasePage> {
                                 onPressed: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => const TicTacToePage(),
+                                    builder: (_) => const TokenCoinGamePage(),
                                   ),
                                 ),
-                                icon: const Icon(Icons.sports_esports),
+                                icon: const Icon(Icons.paid),
                                 label: const Text(
-                                  'ไม่มี Token? เล่น X/O เพื่อรับ Token',
+                                  'ไม่มี Token? เก็บเหรียญเพื่อรับ Token',
                                 ),
                               ),
                           ],
